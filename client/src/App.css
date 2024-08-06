@@ -1,0 +1,175 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #FFFFFF;
+  color: #333;
+}
+
+
+.main-content {
+  display: flex;
+  flex-direction: row; 
+  justify-content: center; 
+  align-items: center; 
+  height: 80vh; 
+  padding: 0 10%;
+}
+
+.logo img {
+  width: 500px; 
+  height: auto;
+  margin-right: 200px; 
+}
+
+.auth-box {
+  border: 1px solid #d6d3d3;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 300px; 
+  margin-top: 20px; 
+}
+
+.auth-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-box .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-box label {
+  margin-bottom: 5px;
+}
+
+.auth-box input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.auth-box button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.auth-box button:hover {
+  background-color: #0056b3;
+}
+
+.create-account {
+  margin-top: 50px;
+}
+
+.create-account a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.create-account a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  background-color: #03121A;
+  color: white;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+.credentials-box {
+  border: 1px solid #d6d3d3;
+  padding: 20px;
+  margin: 10px 0;
+}
+
+.slogan {
+  text-align: center; 
+  font-size: 1.7em; 
+}
+
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #d6d3d3;
+  width: 40%;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.modal-content form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #272424;
+  border-radius: 4px;
+}
+
+.modal-content form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #000000;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+.close-button {
+  color: #000000;
+  float: left;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}

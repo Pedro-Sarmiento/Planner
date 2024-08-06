@@ -1,0 +1,25 @@
+# .gitignore
+
+# Node modules
+node_modules/
+build/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+aws_start.txt
+start_project.bat

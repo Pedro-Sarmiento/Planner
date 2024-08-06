@@ -1,0 +1,30 @@
+# Client dependencies
+client/node_modules/
+
+# Python virtual environment
+server/.venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Environment variables
+.env
+
+# Editor files
+.vscode/
+.idea/
+
+aws_start.txt
+start_project.bat

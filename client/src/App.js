@@ -40,21 +40,19 @@ function App() {
 
     try {
         const response = await fetch('http://127.0.0.1:5000/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-        });
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData),
+          mode: 'cors',
+          credentials: 'include',  // Esto asegura que las cookies de sesión se envíen y se guarden
+      });
 
         if (response.ok) {
             const data = await response.json();
             console.log('Login successful:', data);
 
-            // Store the user ID in localStorage
-            localStorage.setItem('user_id', data.user_id);
-
-            // Redirect to the home page
             navigate('/home');
             
         } else {

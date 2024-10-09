@@ -1,7 +1,9 @@
-from flask import request, jsonify, Blueprint
+from flask import session, request, jsonify, Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
-from src.models import User, db, Profile
+from src.models import User, db, Profile, Task
 import traceback
+from markupsafe import escape
+import datetime
 
 api = Blueprint('api', __name__)
 
@@ -85,27 +87,49 @@ def login():
     try:
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
+            session["username"] = user.username
+            session["user_id"] = user.id
+            session.modified = True
+
+            print(f'User {user.username} logged in')
+            print(f'Session data: {session}')
+
             return jsonify({'message': 'Login successful', 'user_id': user.id}), 200
         else:
             return jsonify({"message": "Invalid username or password"}), 401
     except Exception as e:
-        print(traceback.format_exc())  # Log the full traceback
+        print(traceback.format_exc())
         return jsonify({'error': 'Internal server error'}), 500
+
 
 
 @api.route('/home', methods=['GET'])
 def home():
-    posts = [
-        {"id": 1, "content": "Hello, world!", "author": "User1"},
-        {"id": 2, "content": "This is a post.", "author": "User2"},
-    ]
-    return jsonify(posts)
 
+    print('Home request received')
+    print(f'Session data: {session}')
+    session.modified = True
 
-@api.route('/api/profile', methods=['GET'])
+    if "username" in session:
+        return "Welcome to the home page %s!" % escape(session["username"]) + f'{session}'
+    else:
+        return jsonify({"error": "User not logged in"}), 401
+
+@api.route('/profile', methods=['POST'])
 def profile():
-    user_id = request.args.get('user_id', type=int)  # Fetch user_id from query parameters
+    print('Profile request received')
+    print(f'Session data: {session}')
+    user_id = session.get("user_id")    
+    print(f'User ID from session: {user_id}')
+
+    # Verificar si el user_id existe en la sesión
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    # Buscar al usuario en la base de datos usando el user_id
     user = User.query.get(user_id)
+    
+    # Si el usuario existe y tiene un perfil
     if user and user.profile:
         profile_data = {
             "username": user.username,
@@ -116,4 +140,110 @@ def profile():
             "plans": user.profile.plans
         }
         return jsonify(profile_data)
+
     return jsonify({"error": "User not found"}), 404
+
+# Ruta para obtener todas las tareas del usuario logueado
+@api.route('/tasks', methods=['GET'])
+def get_tasks():
+    print('Get tasks request received')
+    print(session)
+
+    # Verificar si el usuario está logueado
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    # Filtrar las tareas por el user_id
+    tasks = Task.query.filter_by(user_id=user_id).all()
+
+    # Devolver las tareas como JSON
+    return jsonify([task.to_dict() for task in tasks])
+
+@api.route('/tasks', methods=['POST'])
+def add_task():
+    user_id = session.get('user_id')
+    if not user_id:
+        print('User not logged in')
+        return jsonify({"error": "User not logged in"}), 401
+
+    # Obtener los datos de la tarea desde la solicitud
+    data = request.json
+    if not data or 'title' not in data or 'start' not in data or 'end' not in data:
+        return jsonify({"error": "Missing task data"}), 400
+
+    try:
+        start = datetime.datetime.fromisoformat(data['start'])
+        end = datetime.datetime.fromisoformat(data['end'])
+
+        # Si es "Todo el día", agregar 1 segundo a la hora final
+        if data.get('allDay', False):
+            end += datetime.timedelta(seconds=1)
+
+        new_task = Task(
+            user_id=user_id,  # Obtener el user_id de la sesión
+            title=data['title'],
+            description=data.get('description', ''),  # Descripción opcional
+            priority=data.get('priority', 'media'),   # Prioridad opcional, valor por defecto: 'media'
+            category=data.get('category', 'general'), # Categoría opcional, valor por defecto: 'general'
+            start=start,
+            end=end,
+            allDay=data.get('allDay', False),        # Campo all_day, valor por defecto: False
+            completed=data.get('completed', False)    # Estado opcional
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        return jsonify(new_task.to_dict()), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating task: {e}")
+        return jsonify({"error": "An error occurred while creating the task"}), 500
+
+
+@api.route('/tasks/<int:id>', methods=['PUT'])
+def update_task(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify({'message': 'Task not found'}), 404
+
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    try:
+        start = datetime.datetime.fromisoformat(data['start'])
+        end = datetime.datetime.fromisoformat(data['end'])
+
+        # Si es "Todo el día", agregar 1 segundo a la hora final
+        if data.get('allDay', task.all_day):
+            end += datetime.timedelta(seconds=1)
+
+        # Actualizar los campos de la tarea
+        task.title = data['title']
+        task.description = data.get('description', task.description)  # Actualizar descripción
+        task.priority = data.get('priority', task.priority)           # Actualizar prioridad
+        task.category = data.get('category', task.category)           # Actualizar categoría
+        task.start = start                                            # Actualizar fecha de inicio
+        task.end = end                                                # Actualizar fecha de fin
+        task.all_day = data.get('allDay', task.all_day)               # Actualizar campo all_day
+        task.completed = data.get('completed', task.completed)        # Actualizar estado de completado
+
+        db.session.commit()
+        return jsonify(task.to_dict()), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating task: {e}")
+        return jsonify({"error": "An error occurred while updating the task"}), 500
+
+# Ruta para eliminar una tarea
+@api.route('/tasks/<int:id>', methods=['DELETE'])
+def delete_task(id):
+    task = Task.query.get(id)
+    if task is None:
+        return jsonify({'message': 'Task not found'}), 404
+
+    db.session.delete(task)
+    db.session.commit()
+    return jsonify({'message': 'Task deleted'}), 200

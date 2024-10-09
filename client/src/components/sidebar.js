@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faSearch, faEnvelope, faHeart, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faSearch, faHeart, faUser, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import './Sidebar.css'; 
 
 
@@ -21,9 +21,9 @@ function Sidebar() {
                     <span>Búsqueda</span>
                 </a>
 
-                <a href="/messages" className="sidebar-item">
-                    <FontAwesomeIcon icon={faEnvelope} />
-                    <span>Mensajes</span>
+                <a href="/calendar" className="sidebar-item">
+                    <FontAwesomeIcon icon={faCalendar} />
+                    <span>Calendario</span>
                 </a>
 
                 <a href="/notifications" className="sidebar-item">

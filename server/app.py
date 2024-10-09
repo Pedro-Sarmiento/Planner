@@ -5,10 +5,13 @@ from src.models import db
 
 app = create_app()
 
+# Registrar el blueprint
 app.register_blueprint(api_blueprint)
-app.debug=True
+
+# Crear las tablas en la base de datos
 with app.app_context():
     db.create_all()
+
+# Ejecutar la aplicación
 if __name__ == "__main__":
-    app.run(host='0.0.0.0') 
-    
+    app.run() 

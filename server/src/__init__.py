@@ -1,32 +1,46 @@
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from config.config import Config, ProductionConfig, DevelopmentConfig, TestingConfig
-from config.logger import conf_logging # si hiciste el punto 3.2
+from config.logger import conf_logging 
 import os
 from src.models import db
 from flask_cors import CORS
+import redis
+from dotenv import load_dotenv
 
-conf_logging() # si hiciste el punto 3.2
+conf_logging()
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__)
-    CORS(app) 
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
-    
-    app.config.from_object(Config)
-    db.init_app(app)
+    # Cargar configuración según el entorno
+    load_dotenv()
+    ENV = os.getenv('FLASK_ENV')
 
-    if Config.FLASK_ENV == 'development':
+    if ENV == 'production':
+        app.config.from_object(ProductionConfig)
+    elif ENV == 'testing':
+        app.config.from_object(TestingConfig)
+    else:
         app.config.from_object(DevelopmentConfig)
 
-    elif Config.FLASK_ENV == 'production':
-        app.config.from_object(ProductionConfig)
+    app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'defaultsecretkey')
+    # Configuración de Flask-Session para manejar sesiones en el servidor
 
-    else:
-        app.config.from_object(TestingConfig) # it'd be testing
+    app.config['SESSION_REDIS'] = redis.StrictRedis(host='127.0.0.1', port=6379)  # Cambia según la configuración de tu Redis
+    app.config['SESSION_TYPE'] = 'redis' # Puedes usar Redis, Memcached, etc.
+    app.config['SESSION_PERMANENT'] = True  # Evitar que las sesiones duren indefinidamente
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_COOKIE_SECURE'] = True  # Debe ser True si usas HTTPS
+    app.config['SESSION_COOKIE_HTTPONLY'] = True  # Para proteger las cookies
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Cambia según sea necesario
 
+    Session(app)
+
+    # Inicializar la base de datos
+    db.init_app(app)
 
     return app
-
-
 
 

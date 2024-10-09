@@ -2,25 +2,25 @@ import React, { useState } from 'react';
 import './ChatModal.css'; // Asegúrate de tener el archivo CSS
 
 const ChatModal = ({ onClose }) => {
-  const [activeTab, setActiveTab] = useState('chat'); // Controla qué pestaña está activa
-  const [messages, setMessages] = useState([]); // Para almacenar los mensajes del usuario y las respuestas de GPT
-  const [input, setInput] = useState(''); // Para controlar la entrada de texto del usuario
-  const [eventData, setEventData] = useState({ title: '', start: '', end: '', allDay: false }); // Estado para el formulario de eventos
+  const [activeTab, setActiveTab] = useState('chat'); // Controls the active tab
+  const [messages, setMessages] = useState([]); // Stores user and GPT messages
+  const [input, setInput] = useState(''); // Controls user input for chat
+  const [eventData, setEventData] = useState({ title: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' }); // State for the task form
 
   const handleOverlayClick = (e) => {
     if (e.target.classList.contains('modalOverlay')) {
-      onClose(); // Cierra el modal
+      onClose(); // Close modal
     }
   };
 
-  // Función que se ejecuta al enviar un mensaje
+  // Function to handle sending a message
   const handleSend = () => {
-    if (input.trim() === '') return; 
+    if (input.trim() === '') return;
 
     setMessages([...messages, { sender: 'user', text: input }]);
 
     setTimeout(() => {
-      const response = `Respuesta de GPT a: ${input}`; 
+      const response = `Respuesta de GPT a: ${input}`;
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: 'gpt', text: response },
@@ -30,24 +30,28 @@ const ChatModal = ({ onClose }) => {
     setInput('');
   };
 
-  // Función para manejar el envío del formulario de eventos
+  // Function to handle task form submission
   const handleEventSubmit = (e) => {
-    e.preventDefault(); // Evitar que la página se recargue
+    e.preventDefault();
 
-    // Validar que los datos del formulario estén completos (puedes personalizar esta validación)
-    if (!eventData.title || (!eventData.start && !eventData.allDay) || (!eventData.end && !eventData.allDay)) {
+    // Validate the form
+    if (!eventData.title || (!eventData.startDate && !eventData.allDay) || (!eventData.endDate && !eventData.allDay)) {
       console.error('Datos del evento incompletos.');
       return;
     }
 
     const taskData = {
       title: eventData.title,
-      start: eventData.allDay ? 'Todo el día' : eventData.start,
-      end: eventData.allDay ? 'Todo el día' : eventData.end,
+      description: eventData.description || '',
+      priority: eventData.priority,
+      category: eventData.category,
+      start: eventData.allDay ? eventData.startDate : `${eventData.startDate}T${eventData.startTime}`,
+      end: eventData.allDay ? eventData.endDate : `${eventData.endDate}T${eventData.endTime}`,
       allDay: eventData.allDay,
+      completed: false,
     };
 
-    // Añadir la nueva tarea al backend usando fetch
+    // Send the task data to the backend
     fetch('http://127.0.0.1:5000/tasks', {
       method: 'POST',
       credentials: 'include',
@@ -57,17 +61,16 @@ const ChatModal = ({ onClose }) => {
       body: JSON.stringify(taskData),
     })
       .then((response) => response.json())
-      .then((newTask) => {
-        newTask.start = new Date(newTask.start);
-        newTask.end = new Date(newTask.end);
-        setEventData({ title: '', start: '', end: '', allDay: false });
+      .then(() => {
+        // Reset form state after submission
+        setEventData({ title: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' });
       })
       .catch((error) => {
         console.error('Error al añadir la tarea:', error);
       });
   };
 
-  // Manejador de cambios en el checkbox "Todo el día"
+  // Handle changes in the "All Day" checkbox
   const handleAllDayChange = (e) => {
     setEventData({ ...eventData, allDay: e.target.checked });
   };
@@ -81,7 +84,7 @@ const ChatModal = ({ onClose }) => {
           </span>
         </div>
 
-        {/* Pestañas */}
+        {/* Tabs */}
         <div className="tabs">
           <button
             className={activeTab === 'chat' ? 'active' : ''}
@@ -97,7 +100,7 @@ const ChatModal = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Contenido de las pestañas */}
+        {/* Tab Content */}
         <div className="tabContent">
           {activeTab === 'chat' && (
             <div className="chatSection">
@@ -132,59 +135,108 @@ const ChatModal = ({ onClose }) => {
 
           {activeTab === 'form' && (
             <div className="formSection">
-  <h3>Añadir Evento</h3>
-  <form onSubmit={handleEventSubmit}>
-    <label>Título del Evento</label>
-    <input
-      type="text"
-      placeholder="Título del Evento"
-      value={eventData.title}
-      onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
-      required
-      className="inputField"
-    />
-    <label className='aa'>
-      <input
-        type="checkbox"
-        checked={eventData.allDay}
-        onChange={handleAllDayChange}
-      />
-      Todo el día
-    </label>
-    <br />
-    <br />
-    <label>Fecha de inicio</label>
-    <input
-      type="datetime-local"
-      placeholder="Fecha de inicio"
-      value={eventData.start}
-      onChange={(e) => setEventData({ ...eventData, start: e.target.value })}
-      required
-      disabled={eventData.allDay} // Deshabilitar si es "Todo el día"
-      className="inputField"
-    />
-    <label>Fecha de fin</label>
-    <input
-      type="datetime-local"
-      placeholder="Fecha de fin"
-      value={eventData.end}
-      onChange={(e) => setEventData({ ...eventData, end: e.target.value })}
-      required
-      disabled={eventData.allDay} // Deshabilitar si es "Todo el día"
-      className="inputField"
-    />
+              <h3>Añadir Evento</h3>
+              <form onSubmit={handleEventSubmit}>
+                <label>Título del Evento</label>
+                <input
+                  type="text"
+                  placeholder="Título del Evento"
+                  value={eventData.title}
+                  onChange={(e) => setEventData({ ...eventData, title: e.target.value })}
+                  required
+                  className="inputField"
+                />
+                <label className="aa">
+                  <input
+                    type="checkbox"
+                    checked={eventData.allDay}
+                    onChange={handleAllDayChange}
+                  />
+                  Todo el día
+                </label>
+                <br />
+                <br />
+                <label>Fecha de inicio</label>
+                <input
+                  type="date"
+                  placeholder="Fecha de inicio"
+                  value={eventData.startDate}
+                  onChange={(e) => setEventData({ ...eventData, startDate: e.target.value })}
+                  required={!eventData.allDay}
+                  disabled={eventData.allDay}
+                  className="inputField"
+                />
+                {!eventData.allDay && (
+                  <>
+                    <label>Hora de inicio</label>
+                    <input
+                      type="time"
+                      value={eventData.startTime}
+                      onChange={(e) => setEventData({ ...eventData, startTime: e.target.value })}
+                      required
+                      className="inputField"
+                    />
+                  </>
+                )}
+                <br />
+                <br />
+                <label>Fecha de fin</label>
+                <input
+                  type="date"
+                  placeholder="Fecha de fin"
+                  value={eventData.endDate}
+                  onChange={(e) => setEventData({ ...eventData, endDate: e.target.value })}
+                  required={!eventData.allDay}
+                  disabled={eventData.allDay}
+                  className="inputField"
+                />
+                {!eventData.allDay && (
+                  <>
+                    <label>Hora de fin</label>
+                    <input
+                      type="time"
+                      value={eventData.endTime}
+                      onChange={(e) => setEventData({ ...eventData, endTime: e.target.value })}
+                      required
+                      className="inputField"
+                    />
+                  </>
+                )}
+                <br />
+                <br />
 
+                <label>Prioridad</label>
+                <select
+                  value={eventData.priority}
+                  onChange={(e) => setEventData({ ...eventData, priority: e.target.value })}
+                  className="inputField"
+                >
+                  <option value="Baja">Baja</option>
+                  <option value="Media">Media</option>
+                  <option value="Alta">Alta</option>
+                </select>
+                <br />
+                <br />
 
+                <label>Categoría</label>
+                <select
+                  value={eventData.category}
+                  onChange={(e) => setEventData({ ...eventData, category: e.target.value })}
+                  className="inputField"
+                >
+                  <option value="General">General</option>
+                  <option value="Trabajo">Trabajo</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Educación">Educación</option>
+                </select>
+                <br />
+                <br />
 
-    <br />
-
-
-    <button type="submit" className="addEventButton">
-      Añadir Evento
-    </button>
-  </form>
-</div>
-
+                <button type="submit" className="addEventButton">
+                  Añadir Evento
+                </button>
+              </form>
+            </div>
           )}
         </div>
       </div>

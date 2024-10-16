@@ -5,7 +5,7 @@ const ChatModal = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState('chat'); // Controls the active tab
   const [messages, setMessages] = useState([]); // Stores user and GPT messages
   const [input, setInput] = useState(''); // Controls user input for chat
-  const [eventData, setEventData] = useState({ title: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' }); // State for the task form
+  const [eventData, setEventData] = useState({ title: '', description: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' }); // State for the task form
 
   const handleOverlayClick = (e) => {
     if (e.target.classList.contains('modalOverlay')) {
@@ -42,7 +42,7 @@ const ChatModal = ({ onClose }) => {
 
     const taskData = {
       title: eventData.title,
-      description: eventData.description || '',
+      description: eventData.description,  // Adding description to the task
       priority: eventData.priority,
       category: eventData.category,
       start: eventData.allDay ? eventData.startDate : `${eventData.startDate}T${eventData.startTime}`,
@@ -63,7 +63,7 @@ const ChatModal = ({ onClose }) => {
       .then((response) => response.json())
       .then(() => {
         // Reset form state after submission
-        setEventData({ title: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' });
+        setEventData({ title: '', description: '', startDate: '', startTime: '', endDate: '', endTime: '', allDay: false, priority: 'Baja', category: 'General' });
       })
       .catch((error) => {
         console.error('Error al añadir la tarea:', error);
@@ -146,6 +146,13 @@ const ChatModal = ({ onClose }) => {
                   required
                   className="inputField"
                 />
+                <label>Descripción</label>
+                <textarea
+                  placeholder="Descripción del Evento"
+                  value={eventData.description}
+                  onChange={(e) => setEventData({ ...eventData, description: e.target.value })}
+                  className="inputField"
+                />
                 <label className="aa">
                   <input
                     type="checkbox"
@@ -162,8 +169,7 @@ const ChatModal = ({ onClose }) => {
                   placeholder="Fecha de inicio"
                   value={eventData.startDate}
                   onChange={(e) => setEventData({ ...eventData, startDate: e.target.value })}
-                  required={!eventData.allDay}
-                  disabled={eventData.allDay}
+
                   className="inputField"
                 />
                 {!eventData.allDay && (
@@ -186,8 +192,6 @@ const ChatModal = ({ onClose }) => {
                   placeholder="Fecha de fin"
                   value={eventData.endDate}
                   onChange={(e) => setEventData({ ...eventData, endDate: e.target.value })}
-                  required={!eventData.allDay}
-                  disabled={eventData.allDay}
                   className="inputField"
                 />
                 {!eventData.allDay && (

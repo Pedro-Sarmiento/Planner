@@ -4,6 +4,7 @@ from src.models import User, db, Profile, Task
 import traceback
 from markupsafe import escape
 import datetime
+from src.audio import audio_recorder, speech2text
 
 api = Blueprint('api', __name__)
 
@@ -189,7 +190,9 @@ def add_task():
             start=start,
             end=end,
             allDay=data.get('allDay', False),        # Campo all_day, valor por defecto: False
-            completed=data.get('completed', False)    # Estado opcional
+            completed=data.get('completed', False),
+            reminder=data.get('reminder', None)       # Recordatorio opcional
+# Estado opcional
         )
         db.session.add(new_task)
         db.session.commit()
@@ -228,6 +231,7 @@ def update_task(id):
         task.end = end                                                # Actualizar fecha de fin
         task.all_day = data.get('allDay', task.all_day)               # Actualizar campo all_day
         task.completed = data.get('completed', task.completed)        # Actualizar estado de completado
+        task.reminder = data.get('reminder', task.reminder)           # Actualizar recordatorio
 
         db.session.commit()
         return jsonify(task.to_dict()), 200
@@ -247,3 +251,15 @@ def delete_task(id):
     db.session.delete(task)
     db.session.commit()
     return jsonify({'message': 'Task deleted'}), 200
+
+
+@api.route("/audio", methods=['POST'])
+def audio():
+    data = request.get_json()
+    language = data['language']
+    str = audio_recorder()
+    if str == "ERROR: Try again":
+        return str
+    else:
+        transcription = speech2text(language)
+        return transcription 

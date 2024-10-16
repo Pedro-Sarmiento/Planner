@@ -6,6 +6,8 @@ import './TaskCalendar.css';
 import Sidebar from './sidebar';
 import FloatingButton from './FloatingButton';
 import TaskDetailsModal from './TaskDetailsModal';  // Importamos el modal que crearemos a continuación
+import { toast, ToastContainer } from 'react-toastify';  // Import react-toastify
+import 'react-toastify/dist/ReactToastify.css';  // Import CSS for toastify
 import { faTruckMonster } from '@fortawesome/free-solid-svg-icons';
 
 moment.updateLocale('en', {
@@ -26,10 +28,12 @@ const TaskCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [editingTask, setEditingTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);  // Estado para la tarea seleccionada en el modal
-  const setIsModalOpen = useState(false);   // Estado para controlar la visibilidad del modal
+  const [isModalOpen, setIsModalOpen] = useState(false);   // Estado para controlar la visibilidad del modal
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [allDay, setAllDay] = useState(true); // Añadir estado para el checkbox
+  const [reminder, setReminder] = useState(10); // Default to 10 minutes reminder
+
 
   useEffect(() => {
     fetch('http://127.0.0.1:5000/tasks', {
@@ -64,6 +68,7 @@ const addOrEditTask = () => {
     start: allDay ? startDate : `${startDate}T${startTime}`,  // Incluye la hora si no es "All Day"
     end: allDay ? endDate : `${endDate}T${endTime}`,          // Incluye la hora si no es "All Day"
     allDay: allDay,  // Usar el valor del checkbox
+    reminder: reminder,  // Add reminder time
     completed: false,
   };
 
@@ -115,6 +120,7 @@ const addOrEditTask = () => {
   setStartDate('');
   setEndDate('');
   setEndTime('');
+  setReminder(10);  // Reset reminder time
   setStartTime('');
 };
 
@@ -127,6 +133,7 @@ const addOrEditTask = () => {
     setAllDay(faTruckMonster);
     setStartDate('');
     setEndDate('');
+    setReminder(10);  // Default reminder time
     setSelectedDate(slotInfo.start);
     setEditingTask(null); // Cancelar edición cuando se selecciona otra fecha
   };
@@ -164,6 +171,7 @@ const addOrEditTask = () => {
     setEndDate(task.endDate || '');
     setStartTime(task.start ? moment(task.start).format('HH:mm') : '');
     setEndTime(task.end ? moment(task.end).format('HH:mm') : '');
+    setReminder(task.reminder || 10);  // Set reminder time
     setEditingTask(task);
     setSelectedDate(task.start);
     closeModal();  // Cerrar el modal cuando entremos en modo edición
@@ -182,11 +190,60 @@ const addOrEditTask = () => {
     return {};
   };
 
+    // Event Prop Getter function for setting colors based on priority
+    const eventPropGetter = (event) => {
+      let backgroundColor = '';
+      if (event.priority === 'Alta') {
+        backgroundColor = 'red';
+      } else if (event.priority === 'Media') {
+        backgroundColor = 'orange';
+      } else if (event.priority === 'Baja') {
+        backgroundColor = 'green';
+      }
+  
+      return { style: { backgroundColor } };
+    };
+    // Helper function to format reminder time
+    const formatReminderTime = (minutes) => {
+      if (minutes >= 1440) {
+        const days = minutes / 1440;
+        return days === 1 ? '1 día' : `${days} días`;
+      } else if (minutes >= 60) {
+        const hours = minutes / 60;
+        return hours === 1 ? '1 hora' : `${hours} horas`;
+      } else {
+        return `${minutes} minutos`;
+      }
+    };
+
+
+  useEffect(() => {
+    events.forEach((event) => {
+      const now = new Date();
+      const eventStart = new Date(event.start);
+      const timeUntilReminder = eventStart - now - event.reminder * 60000;  // Reminder time in milliseconds
+
+      if (timeUntilReminder > 0) {
+        setTimeout(() => {
+          const formattedReminder = formatReminderTime(event.reminder);
+          toast.info(`Recordatorio: La tarea "${event.title}" comienza en ${formattedReminder}.`, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }, timeUntilReminder);
+      }
+    });
+  }, [events]);
+    
   return (
     <div>
       <Sidebar />
       <FloatingButton />
-  
+      <ToastContainer />
       <div className="task-calendar-container">
         <h2>Calendario de Tareas</h2>
   
@@ -202,6 +259,7 @@ const addOrEditTask = () => {
           onSelectSlot={handleDateSelect}
           onSelectEvent={handleEventSelect}
           dayPropGetter={dayPropGetter}
+          eventPropGetter={eventPropGetter}
           style={{ height: 500 }}
           messages={{
             next: 'Siguiente',
@@ -305,6 +363,16 @@ const addOrEditTask = () => {
             <option value="Trabajo">Trabajo</option>
             <option value="Personal">Personal</option>
             <option value="Educación">Educación</option>
+          </select>
+          <br /><br />
+
+          <label>Recordatorio:</label>
+          <select value={reminder} onChange={(e) => setReminder(Number(e.target.value))}>
+            <option value={5}>5 minutos antes</option>
+            <option value={10}>10 minutos antes</option>
+            <option value={30}>30 minutos antes</option>
+            <option value={60}>1 hora antes</option>
+            <option value={1440}>1 día antes</option>
           </select>
           <br /><br />
   

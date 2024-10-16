@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv  # se instala con `pip install python-dotenv`
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -11,12 +11,13 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = True  # Ensure debug mode is always on
 
+# Here we should have a class for each environment
 class ProductionConfig(Config):
-    pass  # Inherits DEBUG = True from Config
+    pass
 
 class DevelopmentConfig(Config):
-    pass  # Inherits DEBUG = True from Config
+    pass
 
 class TestingConfig(Config):
     TESTING = True
-    DEBUG = True  # Ensure debug mode is on for testing as well
+    DEBUG = True  

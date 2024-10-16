@@ -35,7 +35,7 @@ class Task(db.Model):
     start = db.Column(db.DateTime, nullable=False)
     end = db.Column(db.DateTime, nullable=False)
     allDay = db.Column(db.Boolean, default=False)
-    reminder = db.Column(db.Integer, nullable=True)  # Reminder in minutes before the task
+    reminder = db.Column(db.Integer, nullable=True)
     completed = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
@@ -48,7 +48,7 @@ class Task(db.Model):
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
             'allDay': self.allDay,
-            'reminder': self.reminder,  # Include reminder
+            'reminder': self.reminder, 
             'completed': self.completed,
         }
 

@@ -1,24 +1,23 @@
 import os
-from dotenv import load_dotenv # se instala con `pip install python-dotenv`
+from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 
 class Config:
-    FLASK_ENV = os.getenv('FLASK_ENV')
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-    
+    ENV = 'development'
     SQLALCHEMY_DATABASE_URI = (
         'mysql+pymysql://root:928630635@127.0.0.1/planner'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+    DEBUG = True  # Ensure debug mode is always on
+
+# Here we should have a class for each environment
 class ProductionConfig(Config):
-    DEBUG = False
+    pass
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    pass
 
 class TestingConfig(Config):
     TESTING = True
-    
-
+    DEBUG = True  

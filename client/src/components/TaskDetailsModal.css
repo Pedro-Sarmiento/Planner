@@ -1,0 +1,89 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 60%; /* Ajusta el ancho según necesites */
+    max-width: 100%;
+    max-height: 80%; /* Limita la altura máxima */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* Permitir scroll en el contenido */
+    position: relative;
+    display: flex;
+    flex-direction: column; /* Asegura que los botones estén siempre al final */
+  }
+  .task-details {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    max-height: 60vh; /* Limita la altura de la sección de detalles */
+    overflow-y: auto; /* Activa el scroll en esta sección */
+  }
+  
+  .modalContent h3 {
+    margin-top: 0;
+    font-size: 24px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .modalContent p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #555;
+  }
+
+  
+  .modalButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto; /* Empuja los botones hacia el final del modal */
+  }
+  
+  .edit-button, .delete-button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    
+  }
+  
+  .edit-button {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
+    
+  }
+  
+  .delete-button:hover {
+    background-color: #c82333;
+  }
+
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .closeButton:hover {
+    color: #f00;
+  }

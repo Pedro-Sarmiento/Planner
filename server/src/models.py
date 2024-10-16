@@ -24,3 +24,32 @@ class Profile(db.Model):
 
     def __repr__(self):
         return f'<Profile {self.user_id}>'
+    
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(50), nullable=True)
+    category = db.Column(db.String(100), nullable=True)
+    start = db.Column(db.DateTime, nullable=False)
+    end = db.Column(db.DateTime, nullable=False)
+    allDay = db.Column(db.Boolean, default=False)
+    reminder = db.Column(db.Integer, nullable=True)
+    completed = db.Column(db.Boolean, default=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'priority': self.priority,
+            'category': self.category,
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+            'allDay': self.allDay,
+            'reminder': self.reminder, 
+            'completed': self.completed,
+        }
+
+

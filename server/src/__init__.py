@@ -1,32 +1,43 @@
 from flask import Flask
+from flask_session import Session
 from config.config import Config, ProductionConfig, DevelopmentConfig, TestingConfig
-from config.logger import conf_logging # si hiciste el punto 3.2
+from config.logger import conf_logging 
 import os
 from src.models import db
 from flask_cors import CORS
+import redis
+from dotenv import load_dotenv
 
-conf_logging() # si hiciste el punto 3.2
+conf_logging()
 
-def create_app(config_class=Config):
+def create_app():
     app = Flask(__name__)
-    CORS(app) 
+    CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
-    
-    app.config.from_object(Config)
-    db.init_app(app)
+    load_dotenv()
+    ENV = os.getenv('FLASK_ENV')
 
-    if Config.FLASK_ENV == 'development':
+    if ENV == 'production':
+        app.config.from_object(ProductionConfig)
+    elif ENV == 'testing':
+        app.config.from_object(TestingConfig)
+    else:
         app.config.from_object(DevelopmentConfig)
 
-    elif Config.FLASK_ENV == 'production':
-        app.config.from_object(ProductionConfig)
+    app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'defaultsecretkey')
 
-    else:
-        app.config.from_object(TestingConfig) # it'd be testing
+    app.config['SESSION_REDIS'] = redis.StrictRedis(host='127.0.0.1', port=6379)  
+    app.config['SESSION_TYPE'] = 'redis' 
+    app.config['SESSION_PERMANENT'] = True
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 
+    Session(app)
+
+    db.init_app(app)
 
     return app
-
-
 
 

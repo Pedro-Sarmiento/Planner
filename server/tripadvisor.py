@@ -1,7 +1,7 @@
 import requests
 
 # Configuración de parámetros
-api_key = 'AIzaSyAZ6NmKoFWDqS6AxS7uIEGpxGvXkgL2k6E'
+api_key = ''
 location = '27.9202,-15.5476'  # Coordenadas de Gran Canaria
 radius = 5000  # En metros
 type_place = 'restaurant'

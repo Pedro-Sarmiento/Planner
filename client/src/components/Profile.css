@@ -49,6 +49,7 @@
 .stat h2 {
     margin: 0;
     font-size: 22px;
+    text-align: center;
 }
 
 .stat p {
@@ -68,4 +69,18 @@
 
 .edit-profile-btn:hover {
     background-color: #45a049;
+}
+
+.saved-plans {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.plan-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
 }

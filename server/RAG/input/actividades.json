@@ -1,0 +1,26 @@
+[
+    {
+        "titulo": "Exploración Histórica en el Barrio de Vegueta",
+        "descripcion": "Descubre el corazón histórico de Las Palmas de Gran Canaria en el emblemático barrio de Vegueta",
+        "ubicacion": "Barrio de Vegueta, Las Palmas de Gran Canaria",
+        "presupuesto_estimado": "0",
+        "tiempo_requerido": "2 a 3 horas",
+        "temporada_recomendada": "Todo el año",
+        "tipo_actividad": ["Cultura", "Historia"],
+        "publico_objetivo": ["Amantes de la historia", "familias", "parejas"],
+        "creador": "Planner",
+        "validado": true
+    },
+    {
+        "titulo": "Senderismo en Bandama",
+        "descripcion": "Recorre el impresionante paisaje volcánico de la Caldera de Bandama...",
+        "ubicacion": "Caldera de Bandama, Santa Brígida",
+        "presupuesto_estimado": "0",
+        "tiempo_requerido": "Medio día",
+        "temporada_recomendada": ["Invierno", "Primavera"],
+        "tipo_actividad": ["Naturaleza", "Senderismo"],
+        "publico_objetivo": ["Aventureros", "amantes de la naturaleza", "familias", "parejas", "amigos"],
+        "creador": "Planner",
+        "validado": true
+    }
+]

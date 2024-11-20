@@ -16,7 +16,7 @@ function Profile() {
         })
         .then(response => {
             if (response.status === 401) {
-                throw new Error("User not logged in");
+                window.location.href = '/';
             }
             return response.json();
         })
@@ -38,27 +38,34 @@ function Profile() {
                     <h1>{profile.username}</h1>
                     {isCurrentUser && (
                         <button className="edit-profile-btn">
-                            Edit Profile
+                            Editar Perfil
                         </button>
                     )}
                 </div>
                 <div className="profile-stats">
                     <div className="stat">
-                        <h2>{profile.followers}</h2>
-                        <p>Followers</p>
-                    </div>
-                    <div className="stat">
-                        <h2>{profile.following}</h2>
-                        <p>Following</p>
-                    </div>
-                    <div className="stat">
-                        <h2>{profile.posts}</h2>
-                        <p>Posts</p>
-                    </div>
-                    <div className="stat">
                         <h2>{profile.plans}</h2>
-                        <p>Plans</p>
+                        <p>Nº Planes</p>
                     </div>
+                </div>
+                <div className="saved-plans">
+                    <h2>Saved Plans</h2>
+                    {profile.saved_plans && profile.saved_plans.length > 0 ? (
+                        profile.saved_plans.map((plan, index) => (
+                            <div key={index} className="plan-card">
+                                <h3>{plan.title}</h3>
+                                <p>{plan.description}</p>
+                                <p><strong>Location:</strong> {plan.location}</p>
+                                <p><strong>Budget:</strong> {plan.budget}</p>
+                                <p><strong>Time Required:</strong> {plan.time_required}</p>
+                                <p><strong>Season:</strong> {plan.season}</p>
+                                <p><strong>Activity Type:</strong> {plan.activity_type}</p>
+                                <p><strong>Target Audience:</strong> {plan.target_audience}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No saved plans.</p>
+                    )}
                 </div>
             </div>
         </div>

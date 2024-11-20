@@ -1,0 +1,60 @@
+.company-page {
+    display: flex;
+  }
+  
+  .company-content {
+    margin-left: 250px; /* Ancho de la barra lateral */
+    padding: 20px;
+    flex: 1;
+    background-color: #f9f9f9;
+  }
+  
+  h2 {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  
+  .plan-form {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .plan-form .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .plan-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .plan-form input,
+  .plan-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .plan-form textarea {
+    height: 100px;
+    resize: none;
+  }
+  
+  .submit-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+  
